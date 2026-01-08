@@ -1,9 +1,9 @@
 import express, { Router } from "express";
 import { postController } from "./post.controller";
-const router = express.Router()
+import auth, { UserRole } from "../../middleware/auth";
 
-router.post("/", postController.createPost)
+const router = express.Router();
 
-
+router.post("/", auth(UserRole.USER), postController.createPost)
 
 export const PostRouter: Router = router;
