@@ -3,6 +3,18 @@ import { postService } from "./post.service"
 
 
 
+
+const getAllPost = async (req: Request, res: Response) => {
+    try {
+        const getallresult = await postService.getAllPost()
+        return res.send(getallresult)
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+
 const createPost = async (req: Request, res: Response) => {
 
     try {
@@ -24,16 +36,7 @@ const createPost = async (req: Request, res: Response) => {
 
 
 
-
-const getAllPost = async (req: Request, res: Response) => {
-    try {
-        const getallresult = "fd" //await postService
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-
 export const postController = {
-    createPost, getAllPost
+    createPost,
+    getAllPost,
 }
