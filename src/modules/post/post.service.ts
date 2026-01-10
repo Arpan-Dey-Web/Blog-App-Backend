@@ -3,12 +3,15 @@ import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
 
-const getAllPost = async ({ search, tags, isFeatured, status, authorId }: {
+const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, limit, skip  }: {
     search: string,
     tags: string[],
     isFeatured: boolean | undefined
     status: PostStatus | undefined,
-    authorId: string | undefined
+    authorId: string | undefined,
+    page: number,
+    limit: number,
+    skip : number
 }) => {
 
     const andConditions: PostWhereInput[] = [];
@@ -61,16 +64,20 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId }: {
         andConditions.push({authorId})
     }
 
-
     const allPost = await prisma.post.findMany({
         // kotai ache seta kuje ber korbe
+        take: limit,
+        skip,
         where: {
-            AND: andConditions
+             AND: andConditions
         }
 
-    })
+    }) 
     return allPost;
 }
+
+
+
 
 
 const createPost = async (data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">, userId: string) => {
@@ -83,8 +90,6 @@ const createPost = async (data: Omit<Post, "id" | "createdAt" | "updatedAt" | "a
 
     return result
 }
-
-
 
 
 export const postService = {

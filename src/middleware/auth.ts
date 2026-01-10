@@ -20,7 +20,7 @@ export enum UserRole {
     ADMIN = "ADMIN"
 }
 
- const auth = (...roles: UserRole[]) => {
+const auth = (...roles: UserRole[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const session = await BetterAuth.api.getSession({
