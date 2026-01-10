@@ -1,12 +1,29 @@
 import { Request, Response } from "express"
 import { postService } from "./post.service"
+import { PostStatus } from "../../../generated/prisma/enums";
 
 
 
 
 const getAllPost = async (req: Request, res: Response) => {
     try {
-        const getallresult = await postService.getAllPost()
+        const { search } = req.query;
+        
+        const tags = req.query.tags ? (req.query.tags as string).split(",") : []
+
+        const searchString = typeof search === "string" ? search : ""
+
+        const isFeatured = req.query.isFeatured ?
+            req.query.isFeatured === "true" ?
+                true :
+                req.query.isFeatured === "false" ? false : undefined : undefined
+
+        const status = req.query.status as PostStatus | undefined
+
+        const authorId = req.query.authorId as string | undefined
+
+        const getallresult = await postService.getAllPost({ search: searchString, tags, isFeatured, status, authorId })
+
         return res.send(getallresult)
     } catch (error) {
         console.log(error);
