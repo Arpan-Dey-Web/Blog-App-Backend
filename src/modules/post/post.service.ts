@@ -3,7 +3,7 @@ import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
 
-const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, limit, skip  }: {
+const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, limit, skip, sortOrder, sortBy }: {
     search: string,
     tags: string[],
     isFeatured: boolean | undefined
@@ -11,7 +11,9 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
     authorId: string | undefined,
     page: number,
     limit: number,
-    skip : number
+    skip: number,
+    sortOrder: string | undefined,
+    sortBy: string | undefined
 }) => {
 
     const andConditions: PostWhereInput[] = [];
@@ -61,7 +63,7 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
     }
 
     if (authorId) {
-        andConditions.push({authorId})
+        andConditions.push({ authorId })
     }
 
     const allPost = await prisma.post.findMany({
@@ -69,10 +71,12 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
         take: limit,
         skip,
         where: {
-             AND: andConditions
-        }
-
-    }) 
+            AND: andConditions
+        },
+        orderBy: sortBy && sortOrder ? {
+            [sortBy]: sortOrder
+        } : { cretedAt: 'desc' }
+    })
     return allPost;
 }
 
