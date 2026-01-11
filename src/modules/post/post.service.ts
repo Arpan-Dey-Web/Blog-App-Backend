@@ -12,8 +12,8 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
     page: number,
     limit: number,
     skip: number,
-    sortOrder: string | undefined,
-    sortBy: string | undefined
+    sortOrder: string,
+    sortBy: string
 }) => {
 
     const andConditions: PostWhereInput[] = [];
@@ -73,16 +73,38 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
         where: {
             AND: andConditions
         },
-        orderBy: sortBy && sortOrder ? {
+        orderBy: {
             [sortBy]: sortOrder
-        } : { cretedAt: 'desc' }
+        }
+
     })
-    return allPost;
+    const total = await prisma.post.count({
+        where: {
+            AND: andConditions
+        },
+    })
+
+
+    return {
+        data: allPost,
+        pagination: {
+            total, page, limit,
+            totalPages: Math.ceil(total / limit)
+        }
+
+    };
 }
 
 
-
-
+const getPostById = async (postId : string) => {
+    const result = await prisma.post.findUnique({
+        where: {
+            id: postId
+        }
+    })
+    
+    return result;
+}
 
 const createPost = async (data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">, userId: string) => {
     const result = await prisma.post.create({
@@ -98,5 +120,6 @@ const createPost = async (data: Omit<Post, "id" | "createdAt" | "updatedAt" | "a
 
 export const postService = {
     createPost,
-    getAllPost
+    getAllPost,
+    getPostById
 }

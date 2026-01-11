@@ -15,7 +15,7 @@ CREATE TABLE "posts" (
     "tags" TEXT[],
     "viewCount" INTEGER NOT NULL DEFAULT 0,
     "authorId" TEXT NOT NULL,
-    "cretedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "posts_pkey" PRIMARY KEY ("id")
@@ -29,7 +29,7 @@ CREATE TABLE "comments" (
     "postId" TEXT NOT NULL,
     "parentId" TEXT,
     "status" "CommentStatus" NOT NULL DEFAULT 'APPROVED',
-    "cretedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "comments_pkey" PRIMARY KEY ("id")
