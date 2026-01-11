@@ -37,8 +37,6 @@ const getAllPost = async (req: Request, res: Response) => {
 const getPostById = async (req: Request, res: Response) => {
     try {
         const { postId } = req.params
-        console.log(postId);
-
         if (!postId) {
            throw new Error("post id is required ")
         }

@@ -96,14 +96,26 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
 }
 
 
-const getPostById = async (postId : string) => {
-    const result = await prisma.post.findUnique({
-        where: {
-            id: postId
-        }
-    })
-    
-    return result;
+const getPostById = async (postId: string) => {
+    return await prisma.$transaction(async (tx) => {
+        await tx.post.update({
+            where: {
+                id: postId
+            },
+            data: {
+                viewCount: {
+                    increment: 1
+                }
+            }
+        })
+        const postData = await prisma.post.findUnique({
+            where: {
+                id: postId
+            }
+        })
+        return postData;
+  })
+
 }
 
 const createPost = async (data: Omit<Post, "id" | "createdAt" | "updatedAt" | "authorId">, userId: string) => {
