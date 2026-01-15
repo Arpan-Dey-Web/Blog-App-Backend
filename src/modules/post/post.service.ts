@@ -1,4 +1,4 @@
-import { Post, PostStatus } from "../../../generated/prisma/client";
+import { CommentStatus, Post, PostStatus } from "../../../generated/prisma/client";
 import { PostWhereInput } from "../../../generated/prisma/models";
 import { prisma } from "../../lib/prisma";
 
@@ -75,6 +75,12 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
         },
         orderBy: {
             [sortBy]: sortOrder
+        }, include: {
+            _count: {
+                select: {
+                    comments:true
+                }
+            }
         }
 
     })
@@ -111,10 +117,36 @@ const getPostById = async (postId: string) => {
         const postData = await prisma.post.findUnique({
             where: {
                 id: postId
+            },
+
+            include: {
+                comments: {
+                    where: {
+                        parentId: null,
+                        status: CommentStatus.APPROVED
+                    },
+                    orderBy: { createdAt: "asc" }, // asc or desc
+                    include: {
+                        replies: {
+                            where: {
+                                status: CommentStatus.APPROVED
+                            },
+                            orderBy: { createdAt: "asc" }, // asc or desc
+                            include: {
+                                replies: true
+                            }
+                        }
+                    }
+                },
+                _count: {
+                    select: {
+                        comments: true
+                    }
+                }
             }
         })
         return postData;
-  })
+    })
 
 }
 
