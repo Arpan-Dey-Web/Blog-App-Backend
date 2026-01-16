@@ -1,3 +1,4 @@
+
 import { prisma } from "../../lib/prisma";
 
 type payloadType = {
@@ -32,6 +33,14 @@ const getCommentById = async (id: string) => {
     return await prisma.comment.findUnique({
         where: {
             id
+        },
+        include: {
+            post: {
+                select: {
+                    id: true,
+                    title: true
+                }
+            }
         }
     })
 
@@ -40,10 +49,56 @@ const getCommentById = async (id: string) => {
 
 
 
+const getCommentsByAuthor = async (authorId: string) => {
+    return await prisma.comment.findMany({
+        where: {
+            authorId
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        include: {
+            post: {
+                select: {
+                    id: true,
+                    title: true
+                }
+            }
+        }
+
+    })
+}
+
+
+
+
+const deleteComment = async (commentId: string, authorId: string) => {
+    const commentData = await prisma.comment.findFirst({
+        where: {
+            id: commentId,
+            authorId
+        },
+        select: {
+            id: true
+        }
+    })
+    if (!commentData) {
+        throw new Error("Your provided input is invalid ")
+    }
+
+    return await prisma.comment.delete({
+        where: {
+            id: commentId
+        }
+    })
+}
+
 
 
 
 export const ComementService = {
     createComment,
-    getCommentById
+    getCommentById,
+    getCommentsByAuthor,
+    deleteComment
 }

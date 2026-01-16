@@ -22,7 +22,6 @@ const createComment = async (req: Request, res: Response, next: NextFunction) =>
 }
 
 
-
 const getCommentById = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const { commendID } = req.params;
@@ -39,7 +38,44 @@ const getCommentById = async (req: Request, res: Response, next: NextFunction) =
 
 }
 
+
+const getCommentsByAuthor = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const { authorId } = req.params;
+        const result = await ComementService.getCommentsByAuthor(authorId as string)
+        res.status(201).json(result)
+
+    } catch (error) {
+        res.status(400).json({
+            error: "Author id get Failed",
+            details: error
+        })
+    }
+
+
+}
+
+
+const deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = req.user
+        const { commentId } = req.params;
+        const result = await ComementService.deleteComment(commentId as string, user?.id as string)
+        res.status(201).json(result)
+
+    } catch (error) {
+        res.status(400).json({
+            error: "Comment  Delete Failed",
+            details: error
+        })
+    }
+
+
+}
+
 export const commentController = {
     createComment,
-    getCommentById
+    getCommentById,
+    getCommentsByAuthor,
+    deleteComment
 }
