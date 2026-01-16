@@ -1,49 +1,28 @@
 import { prisma } from "../../lib/prisma";
-
-type payloadType = {
-    content: string,
-    authorId: string,
-    postId: string,
-    parentId?: string,
-}
-
-const createComment = async (payload: payloadType) => {
+const createComment = async (payload) => {
     await prisma.post.findUniqueOrThrow({
         where: {
             id: payload.postId
         }
-    })
-
-
+    });
     if (payload.parentId) {
         await prisma.comment.findUniqueOrThrow({
             where: {
                 id: payload.parentId
             }
-        })
+        });
     }
     return await prisma.comment.create({
         data: payload
-    })
-}
-
-const getCommentById = async (id: string) => {
-
-    return await prisma.comment.findUnique({
-        where: {
-            id
-        }
-    })
-
-
-}
-
-
-
-
-
-
+    });
+};
+const getCommentById = async (commendID) => {
+    console.log("this is  CommentID", commendID);
+    console.log("object");
+    console.log("hello server");
+};
 export const ComementService = {
     createComment,
     getCommentById
-}
+};
+//# sourceMappingURL=comment.service.js.map
