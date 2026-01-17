@@ -112,6 +112,8 @@ const moderateComment = async (req: Request, res: Response, next: NextFunction) 
 
 
 
+
+
 export const commentController = {
     createComment,
     getCommentById,

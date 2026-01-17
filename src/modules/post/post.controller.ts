@@ -2,6 +2,7 @@ import { Request, Response } from "express"
 import { postService } from "./post.service"
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationHelper from "../../helper/paginationHelper";
+import { UserRole } from "../../middleware/auth";
 
 
 
@@ -38,12 +39,12 @@ const getPostById = async (req: Request, res: Response) => {
     try {
         const { postId } = req.params
         if (!postId) {
-           throw new Error("post id is required ")
+            throw new Error("post id is required ")
         }
 
         const result = await postService.getPostById(postId)
         res.status(200).json(result)
-        
+
 
     } catch (error) {
         res.status(400).json({
@@ -75,8 +76,54 @@ const createPost = async (req: Request, res: Response) => {
 }
 
 
+const getMyPost = async (req: Request, res: Response) => {
+    try {
+        const user = req?.user;
+        console.log(user);
+        if (!user) {
+            throw new Error('Unauthorized')
+        }
+        const result = await postService.getMyPost(user.id as string)
+        res.status(200).json(result)
+
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            error: "Post fetched failed",
+            details: error
+        })
+    }
+}
+
+
+const updateMyPost = async (req: Request, res: Response) => {
+    try {
+        const user = req?.user;
+        console.log(user);
+        if (!user) {
+            throw new Error('Unauthorized')
+        }
+        const { postid } = req.params;
+        const isAdmin = user.role === UserRole.ADMIN
+        console.log(user );
+        const result = await postService.updateMyPost(postid as string, req.body, user?.id, isAdmin)
+        res.status(200).json(result)
+
+    } catch (e) {
+        const errorMessage = (e instanceof Error) ? e.message : "Post  update Failed"
+        res.status(400).json({
+            error: errorMessage,
+            details: e
+        })
+    }
+}
+
+
+
 export const postController = {
     createPost,
     getAllPost,
-    getPostById
+    getPostById,
+    getMyPost,
+    updateMyPost
 }

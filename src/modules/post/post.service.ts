@@ -78,7 +78,7 @@ const getAllPost = async ({ search, tags, isFeatured, status, authorId, page, li
         }, include: {
             _count: {
                 select: {
-                    comments:true
+                    comments: true
                 }
             }
         }
@@ -162,8 +162,95 @@ const createPost = async (data: Omit<Post, "id" | "createdAt" | "updatedAt" | "a
 }
 
 
+const getMyPost = async (authorId: string) => {
+    await prisma.user.findUniqueOrThrow(
+        {
+            where: {
+                id: authorId,
+                status: 'ACTIVE'
+            }, select: {
+                id: true,
+
+            }
+        }
+    )
+
+
+    const result = await prisma.post.findMany({
+        where: {
+            authorId
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        include: {
+            _count: {
+                select: {
+                    comments: true
+                }
+            }
+        }
+    })
+
+    // const total = await prisma.post.count({
+    //     where: {
+    //         authorId
+    //     }
+    // })
+
+    const total = await prisma.post.aggregate({
+        _count: {
+            id: true
+        },
+        where: {
+            authorId
+        },
+    })
+
+    return {
+        result,
+        total
+    }
+
+}
+
+
+// USER =>sudhu nijer post update korte parbe, isFeatured update korte parbe na
+// ADMIN => sobar post update korte parbe
+
+const updateMyPost = async (postId: string, data: Partial<Post>, authorId: string, isAdmin: boolean) => {
+    const postdata = await prisma.post.findUniqueOrThrow({
+        where: {
+            id: postId
+        },
+        select: {
+            id: true,
+            authorId: true
+        }
+    })
+
+    if (!isAdmin && (postdata.authorId !== authorId)) {
+        throw new Error("You are not owner of this post ")
+    }
+
+    const result = await prisma.post.update({
+        where: {
+            id: postdata.id
+        },
+        data
+    })
+
+    return result
+
+
+}
+
+
+
 export const postService = {
     createPost,
     getAllPost,
-    getPostById
+    getPostById,
+    getMyPost,
+    updateMyPost
 }
