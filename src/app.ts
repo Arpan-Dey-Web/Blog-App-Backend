@@ -4,6 +4,8 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
 import cors from "cors";
 import { CommentRouter } from "./modules/comment/comment.routes";
+import errorHandler from "./middleware/globalErrorHandler";
+import { notFound } from "./middleware/notfound";
 const app: Application = express()
 
 // ts node dev
@@ -28,4 +30,7 @@ app.get("/", (req, res) => {
     res.send("Blog App Running on PORT:3000")
 })
 
+// ERROR HANDLER
+app.use(errorHandler)
+app.use(notFound)
 export default app;

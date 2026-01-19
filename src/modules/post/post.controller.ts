@@ -1,9 +1,9 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 import { postService } from "./post.service"
 import { PostStatus } from "../../../generated/prisma/enums";
 import paginationHelper from "../../helper/paginationHelper";
 import { UserRole } from "../../middleware/auth";
-
+import { error } from "node:console";
 
 
 
@@ -33,8 +33,6 @@ const getAllPost = async (req: Request, res: Response) => {
     }
 }
 
-
-
 const getPostById = async (req: Request, res: Response) => {
     try {
         const { postId } = req.params
@@ -54,9 +52,7 @@ const getPostById = async (req: Request, res: Response) => {
     }
 }
 
-
-
-const createPost = async (req: Request, res: Response) => {
+const createPost = async (req: Request, res: Response, next:NextFunction) => {
 
     try {
         const user = req.user;
@@ -68,13 +64,9 @@ const createPost = async (req: Request, res: Response) => {
         const result = await postService.createPost(req.body, user.id as string)
         return res.status(201).json(result)
     } catch (error) {
-        console.log(error);
-        return res.status(400).json({
-            error: "post creation failed",
-        })
-    }
+       next(error)
+    } 
 }
-
 
 const getMyPost = async (req: Request, res: Response) => {
     try {
@@ -95,8 +87,7 @@ const getMyPost = async (req: Request, res: Response) => {
     }
 }
 
-
-const updateMyPost = async (req: Request, res: Response) => {
+const updateMyPost = async (req: Request, res: Response, next:NextFunction) => {
     try {
         const user = req?.user;
         console.log(user);
@@ -110,15 +101,9 @@ const updateMyPost = async (req: Request, res: Response) => {
         res.status(200).json(result)
 
     } catch (e) {
-        const errorMessage = (e instanceof Error) ? e.message : "Post  update Failed"
-        res.status(400).json({
-            error: errorMessage,
-            details: e
-        })
+        next(e)
     }
 }
-
-
 
 const deletePost = async (req: Request, res: Response) => {
     try {
@@ -144,8 +129,6 @@ const deletePost = async (req: Request, res: Response) => {
 
 const getStats = async (req: Request, res: Response) => {
     try {
-   
-
         const result = await postService.getStats()
         res.status(200).json(result)
 
@@ -157,6 +140,11 @@ const getStats = async (req: Request, res: Response) => {
         })
     }
 }
+
+
+
+
+
 
 export const postController = {
     createPost,
