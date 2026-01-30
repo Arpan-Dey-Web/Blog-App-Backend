@@ -22,7 +22,7 @@ async function seedAdmin() {
         if (existingUser) {
             throw new Error("User already exists!!")
         }
-        console.log("signup admin ");
+        // console.log("signup admin ");
         const signUpAdmin = await fetch("http://localhost:3000/api/auth/sign-up/email", {
             method: "POST",
             headers: {

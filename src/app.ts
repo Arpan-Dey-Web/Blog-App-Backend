@@ -27,7 +27,7 @@ app.use("/comments", CommentRouter)
 
 
 app.get("/", (req, res) => {
-    res.send("Blog App Running on PORT:3000")
+    res.send(`Blog App Running on PORT: ${process.env.PORT }`)
 })
 
 // ERROR HANDLER
